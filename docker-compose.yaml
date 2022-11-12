@@ -1,0 +1,57 @@
+version: "2"
+
+services:
+  traefik:
+    image: "traefik:v2.7"
+    container_name: "traefik"
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.myresolver.acme.email=YOUR_EMAIL"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  remark:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.comments.rule=(Host(`comments.YOUR_DOMAIN`))"
+      - "traefik.http.routers.comments.entrypoints=web,websecure"
+      - "traefik.http.routers.comments.middlewares=comments-replacepathregex"
+      - "traefik.http.middlewares.comments-replacepathregex.replacepathregex.regex=^/comments/(.*)"
+      - "traefik.http.middlewares.comments-replacepathregex.replacepathregex.replacement=/$$1"
+      - "traefik.http.routers.comments.tls.certresolver=myresolver"
+    image: umputun/remark42:latest
+    container_name: "remark42"
+    hostname: "remark42"
+    restart: always
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    # uncomment to expose directly (no proxy)
+    #ports:
+    #  - "8080:8080"
+
+    environment:
+      - REMARK_URL=https://comments.YOUR_DOMAIN
+      - SECRET=
+      - ADMIN_SHARED_ID=
+      - SITE=blog
+      - DEBUG=true
+      - AUTH_GITHUB_CID=
+      - AUTH_GITHUB_CSEC=
+      - ADMIN_PASSWD=afluehr38lay8etl9384
+    volumes:
+      - ./var:/srv/var
