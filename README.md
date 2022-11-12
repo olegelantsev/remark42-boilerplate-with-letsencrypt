@@ -2,6 +2,6 @@
 
 ## Guideline
 
-Replace YOUR_DOMAIN and YOUR_EMAIL.
-Define SECRET, ADMIN_SHARED_ID and ADMIN_PASSWD environment variables for Remark42.
-For GitHub auth define AUTH_GITHUB_CID and AUTH_GITHUB_CSEC.
+* Replace YOUR_DOMAIN and YOUR_EMAIL.
+* Define SECRET, ADMIN_SHARED_ID and ADMIN_PASSWD environment variables for Remark42.
+* For GitHub auth define AUTH_GITHUB_CID and AUTH_GITHUB_CSEC.
